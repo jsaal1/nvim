@@ -55,7 +55,7 @@ if [ "$PLATFORM" = mac ]; then
   log "Installing system packages via brew"
   brew install \
     neovim git curl unzip make \
-    ripgrep fd \
+    ripgrep fd lazygit \
     node python@3
 
   if [ "$INSTALL_FONT" = 1 ]; then
@@ -88,6 +88,24 @@ else
     mkdir -p "$HOME/.local/bin"
     ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
     log "Symlinked fdfind -> ~/.local/bin/fd (ensure ~/.local/bin is on PATH)"
+  fi
+
+  # lazygit isn't in Ubuntu's apt repos — fetch the latest release binary.
+  if ! command -v lazygit >/dev/null 2>&1; then
+    log "Installing lazygit from GitHub releases"
+    case "$(uname -m)" in
+      x86_64)        LG_ARCH=x86_64 ;;
+      aarch64|arm64) LG_ARCH=arm64 ;;
+      *)             LG_ARCH=x86_64 ;;
+    esac
+    LG_VER="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
+      | grep -Po '"tag_name": *"v\K[^"]*')"
+    TMP="$(mktemp -d)"
+    curl -fsSL -o "$TMP/lazygit.tar.gz" \
+      "https://github.com/jesseduffield/lazygit/releases/download/v${LG_VER}/lazygit_${LG_VER}_Linux_${LG_ARCH}.tar.gz"
+    tar -xf "$TMP/lazygit.tar.gz" -C "$TMP" lazygit
+    sudo install "$TMP/lazygit" /usr/local/bin/lazygit
+    rm -rf "$TMP"
   fi
 
   if [ "$INSTALL_FONT" = 1 ]; then
