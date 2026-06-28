@@ -47,14 +47,16 @@ if [ "$PLATFORM" = mac ]; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
 
+  if ! xcode-select -p >/dev/null 2>&1; then
+    warn "Xcode Command Line Tools not installed. Run: xcode-select --install"
+    warn "(Needed for clangd LSP and treesitter parser compilation.)"
+  fi
+
   log "Installing system packages via brew"
   brew install \
     neovim git curl unzip make \
     ripgrep fd \
-    node python@3 \
-    tree-sitter
-  # tree-sitter here is just the system CLI — Mason owns the one nvim uses.
-  # It's nice to have on $PATH for debugging parsers by hand.
+    node python@3
 
   if [ "$INSTALL_FONT" = 1 ]; then
     log "Installing JetBrainsMono Nerd Font"
@@ -76,6 +78,7 @@ else
   sudo apt-get install -y \
     neovim git curl unzip build-essential \
     ripgrep fd-find \
+    clangd \
     nodejs npm \
     python3 python3-pip python3-venv \
     xclip wl-clipboard

@@ -89,8 +89,6 @@ return {
 
 			taplo = {},
 
-			texlab = {},
-
 			lua_ls = {
 				settings = {
 					Lua = {

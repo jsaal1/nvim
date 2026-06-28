@@ -29,12 +29,10 @@ return {
             ensure_installed = {
                 "lua_ls",
                 "pyright",
-                "clangd",
                 "bashls",
                 "jsonls",
                 "yamlls",
                 "taplo",
-                "texlab",
             },
         })
 
@@ -47,8 +45,6 @@ return {
                 "clang-format",
                 "shfmt",
                 "taplo",
-                "latexindent",
-                { "tree-sitter-cli", version = "v0.24.7" },
             },
             auto_update = false,
             run_on_start = true,

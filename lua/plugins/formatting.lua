@@ -21,8 +21,6 @@ return {
                 yaml = { "prettier" },
                 toml = { "taplo" },
 
-                tex = { "latexindent" },
-
                 markdown = { "prettier" },
             },
 
