@@ -1,48 +1,76 @@
 return {
-	"nvim-treesitter/nvim-treesitter",
-	branch = "master",
-	build = ":TSUpdate",
-	event = { "BufReadPost", "BufNewFile" },
+    "nvim-treesitter/nvim-treesitter",
+    branch = "main",
+    -- the `main` rewrite does not support lazy-loading, and parsers must be
+    -- rebuilt whenever the plugin updates
+    lazy = false,
+    build = ":TSUpdate",
 
-	dependencies = {
-		"windwp/nvim-ts-autotag",
-	},
+    config = function()
+        local treesitter = require("nvim-treesitter")
 
-	config = function()
-		require("nvim-treesitter.configs").setup({
-			ensure_installed = {
-				"json",
-				"yaml",
-				"toml",
-				"markdown",
-				"markdown_inline",
-				"bash",
-				"lua",
-				"vim",
-				"vimdoc",
-				"query",
-				"c",
-				"cpp",
-				"python",
-				"make",
-				"cmake",
-				"regex",
-			},
+        treesitter.setup({
+            install_dir = vim.fn.stdpath("data") .. "/site",
+        })
 
-			sync_install = false,
-			auto_install = false,
+        -- no-op for parsers that are already installed
+        treesitter.install({
+            "json",
+            "yaml",
+            "toml",
+            "markdown",
+            "markdown_inline",
+            "bash",
+            "lua",
+            "vim",
+            "vimdoc",
+            "query",
+            "c",
+            "cpp",
+            "python",
+            "make",
+            "cmake",
+            "regex",
+            "latex",
+            "bibtex",
 
-			highlight = {
-				enable = true,
-			},
+            -- web languages: needed for nvim-ts-autotag, and previously
+            -- installed on the master branch
+            "html",
+            "css",
+            "javascript",
+            "typescript",
+            "tsx",
 
-			indent = {
-				enable = true,
-			},
+            "csv",
+            "fish",
+            "gitignore",
+        })
 
-			autotag = {
-				enable = true,
-			},
-		})
-	end,
+        -- `main` ships only parsers and queries; highlighting and indentation
+        -- are Neovim features we have to turn on per filetype ourselves.
+        local no_indent = { c = true, cpp = true }
+
+        vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("UserTreesitter", { clear = true }),
+            callback = function(ev)
+                local lang = vim.treesitter.language.get_lang(ev.match)
+                if not lang then
+                    return
+                end
+
+                -- no parser installed for this filetype
+                local ok, added = pcall(vim.treesitter.language.add, lang)
+                if not ok or not added then
+                    return
+                end
+
+                vim.treesitter.start(ev.buf, lang)
+
+                if not no_indent[lang] then
+                    vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end
+            end,
+        })
+    end,
 }

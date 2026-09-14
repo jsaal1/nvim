@@ -1,8 +1,8 @@
 return {
-	"windwp/nvim-autopairs",
-	event = "InsertEnter",
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
 
-	opts = {
-		check_ts = true,
-	},
+    opts = {
+        check_ts = true,
+    },
 }

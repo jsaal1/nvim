@@ -64,6 +64,7 @@ if [ "$PLATFORM" = mac ]; then
     brew install \
         neovim git curl unzip make \
         ripgrep fd lazygit \
+        tree-sitter-cli imagemagick \
         node python@3
 
     if [ "$INSTALL_FONT" = 1 ]; then
@@ -87,6 +88,7 @@ else
         neovim git curl unzip build-essential \
         ripgrep fd-find \
         clangd \
+        imagemagick \
         nodejs npm \
         python3 python3-pip python3-venv \
         xclip wl-clipboard
@@ -116,6 +118,24 @@ else
         rm -rf "$TMP"
     fi
 
+    # nvim-treesitter's `main` branch needs tree-sitter-cli >= 0.26.1, which is
+    # newer than apt ships. Grab the release binary.
+    if ! command -v tree-sitter >/dev/null 2>&1; then
+        log "Installing tree-sitter-cli from GitHub releases"
+        case "$(uname -m)" in
+        x86_64) TS_ARCH=x64 ;;
+        aarch64 | arm64) TS_ARCH=arm64 ;;
+        *) TS_ARCH=x64 ;;
+        esac
+        TMP="$(mktemp -d)"
+        curl -fsSL -o "$TMP/ts.gz" \
+            "https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-linux-${TS_ARCH}.gz"
+        gunzip -c "$TMP/ts.gz" > "$TMP/tree-sitter"
+        chmod +x "$TMP/tree-sitter"
+        sudo install "$TMP/tree-sitter" /usr/local/bin/tree-sitter
+        rm -rf "$TMP"
+    fi
+
     if [ "$INSTALL_FONT" = 1 ]; then
         log "Installing JetBrainsMono Nerd Font into ~/.local/share/fonts"
         FONT_DIR="$HOME/.local/share/fonts"
@@ -136,7 +156,7 @@ fi
 # ---------------------------------------------------------------------------
 # 2. Sanity check toolchain
 # ---------------------------------------------------------------------------
-for tool in nvim git node npm python3 rg; do
+for tool in nvim git node npm python3 rg tree-sitter; do
     command -v "$tool" >/dev/null 2>&1 || die "Missing required tool after install: $tool"
 done
 

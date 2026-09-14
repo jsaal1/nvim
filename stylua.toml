@@ -1,0 +1,4 @@
+# Match the editor settings in lua/core/options.lua (expandtab, shiftwidth=4).
+# Without this stylua defaults to tabs and format-on-save undoes any :retab.
+indent_type = "Spaces"
+indent_width = 4

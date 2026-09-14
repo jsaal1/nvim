@@ -31,3 +31,6 @@ opt.splitright = true
 opt.splitbelow = true
 
 opt.swapfile = false
+
+-- 'localoptions' keeps filetype and highlighting across a session restore
+opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"

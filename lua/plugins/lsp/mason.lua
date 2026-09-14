@@ -25,6 +25,12 @@ return {
         })
 
         mason_lspconfig.setup({
+            -- lspconfig.lua enables every server explicitly (with blink's
+            -- capabilities). Leaving this on additionally starts a server for
+            -- any installed package that happens to have an lspconfig entry —
+            -- e.g. `stylua --lsp`, which we only want as a conform formatter.
+            automatic_enable = false,
+
             -- list of servers for mason to install
             ensure_installed = {
                 "lua_ls",
@@ -33,6 +39,7 @@ return {
                 "jsonls",
                 "yamlls",
                 "taplo",
+                "texlab",
             },
         })
 
@@ -45,6 +52,7 @@ return {
                 "clang-format",
                 "shfmt",
                 "taplo",
+                "latexindent",
             },
             auto_update = false,
             run_on_start = true,
